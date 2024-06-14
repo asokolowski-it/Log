@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/as/Projects/Log/build",
+  "command": "/usr/bin/c++ -DBOOST_ATOMIC_NO_LIB -DBOOST_ATOMIC_STATIC_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_CHRONO_STATIC_LINK -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DBOOST_DATE_TIME_NO_LIB -DBOOST_DATE_TIME_STATIC_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_FILESYSTEM_STATIC_LINK=1 -DBOOST_IOSTREAMS_NO_LIB -DBOOST_IOSTREAMS_STATIC_LINK -DBOOST_RANDOM_NO_LIB -DBOOST_RANDOM_STATIC_LINK -DBOOST_SERIALIZATION_NO_LIB -DBOOST_SERIALIZATION_STATIC_LINK -DBOOST_THREAD_NO_LIB -DBOOST_THREAD_STATIC_LINK -DBOOST_THREAD_USE_LIB -DEIGEN_HAS_CXX17_OVERALIGN=0 -isystem /home/as/vcpkg/installed/x64-linux/include/eigen3 -isystem /home/as/vcpkg/installed/x64-linux/include -g -msse4.2 -mfpmath=sse -fopenmp -std=gnu++17 -o CMakeFiles/pcl_project.dir/main.cpp.o -c /home/as/Projects/Log/main.cpp",
+  "file": "/home/as/Projects/Log/main.cpp"
+}
+]
