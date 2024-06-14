@@ -16,19 +16,26 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr loadPointCloud(const std::string& filenam
 }
 
 void findAndAlignCentralAxis(pcl::PointCloud<pcl::PointXYZRGB>::Ptr& cloud) {
-    // Calculate the centroid of the point cloud
+    // Calculate the centroid of the entire point cloud
     Eigen::Vector4f centroid;
     pcl::compute3DCentroid(*cloud, centroid);
 
-    // Perform Principal Component Analysis (PCA) to find the principal axes
+    // Translate the point cloud to center it along the x-axis
+    Eigen::Matrix4f translation = Eigen::Matrix4f::Identity();
+    translation(0, 3) = -centroid[0];
+    translation(1, 3) = -centroid[1];
+    translation(2, 3) = -centroid[2];
+    pcl::transformPointCloud(*cloud, *cloud, translation);
+
+    // Perform PCA to align the principal component with the x-axis
     pcl::PCA<pcl::PointXYZRGB> pca;
     pca.setInputCloud(cloud);
     Eigen::Matrix3f eigenVectors = pca.getEigenVectors();
+    Eigen::Vector3f eigenValues = pca.getEigenValues();
 
     // Align the principal axis with the x-axis
     Eigen::Matrix4f transform = Eigen::Matrix4f::Identity();
-    transform.block<3, 3>(0, 0) = eigenVectors;
-    transform.block<3, 1>(0, 3) = -1.0f * (eigenVectors * centroid.head<3>());
+    transform.block<3, 3>(0, 0) = eigenVectors.transpose();
 
     // Transform the point cloud to align it
     pcl::transformPointCloud(*cloud, *cloud, transform);
@@ -49,7 +56,7 @@ void transformPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr& cloud, float mi
     for (auto& point : cloud->points) {
         float radius = std::sqrt(point.y * point.y + point.z * point.z);
         float theta = std::atan2(point.z, point.y);
-        // Map theta to a linear coordinate (unwrap) and normalize with middle_radius
+        // Map theta to a linear coordinate (unwrap) starting from the point on the minus z-axis that is equal to the middle radius
         point.y = radius * theta;
         // Offset the z-coordinate by the middle radius
         point.z = radius - middle_radius;
