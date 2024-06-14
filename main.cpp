@@ -34,14 +34,25 @@ void findAndAlignCentralAxis(pcl::PointCloud<pcl::PointXYZRGB>::Ptr& cloud) {
     pcl::transformPointCloud(*cloud, *cloud, transform);
 }
 
-void transformPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr& cloud) {
+float calculateMiddleRadius(pcl::PointCloud<pcl::PointXYZRGB>::Ptr& cloud) {
+    float radius_sum = 0.0;
+    int count = 0;
+    for (const auto& point : cloud->points) {
+        float radius = std::sqrt(point.y * point.y + point.z * point.z);
+        radius_sum += radius;
+        count++;
+    }
+    return radius_sum / count;
+}
+
+void transformPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr& cloud, float middle_radius) {
     for (auto& point : cloud->points) {
         float radius = std::sqrt(point.y * point.y + point.z * point.z);
         float theta = std::atan2(point.z, point.y);
-        // Map theta to a linear coordinate (unwrap)
+        // Map theta to a linear coordinate (unwrap) and normalize with middle_radius
         point.y = radius * theta;
-        // Set z to zero as it is the unwrapped angle dimension, keep x as the length along the log
-        point.z = 0.0;
+        // Offset the z-coordinate by the middle radius
+        point.z = radius - middle_radius;
     }
 }
 
@@ -54,13 +65,14 @@ bool savePointCloud(const std::string& filename, pcl::PointCloud<pcl::PointXYZRG
 }
 
 int main(int argc, char** argv) {
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <input_ply_file> <output_ply_file>" << std::endl;
+    if (argc != 4) {
+        std::cerr << "Usage: " << argv[0] << " <input_ply_file> <aligned_ply_file> <output_ply_file>" << std::endl;
         return -1;
     }
 
     std::string input_filename = argv[1];
-    std::string output_filename = argv[2];
+    std::string aligned_filename = argv[2];
+    std::string output_filename = argv[3];
 
     auto cloud = loadPointCloud(input_filename);
     if (!cloud) {
@@ -68,12 +80,19 @@ int main(int argc, char** argv) {
     }
 
     findAndAlignCentralAxis(cloud);
-    transformPointCloud(cloud);
+    
+    // Save the point cloud after aligning the central axis
+    if (!savePointCloud(aligned_filename, cloud)) {
+        return -1;
+    }
+
+    float middle_radius = calculateMiddleRadius(cloud);
+    transformPointCloud(cloud, middle_radius);
 
     if (!savePointCloud(output_filename, cloud)) {
         return -1;
     }
 
-    std::cout << "Transformation complete. Output saved to " << output_filename << std::endl;
+    std::cout << "Transformation complete. Aligned output saved to " << aligned_filename << " and final output saved to " << output_filename << std::endl;
     return 0;
 }
