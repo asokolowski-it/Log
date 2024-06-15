@@ -1,5 +1,5 @@
 {
-  "name": "pcl_project",
+  "name": "pcl-project",
   "version-string": "0.1.0",
   "dependencies": [
     "pcl"
