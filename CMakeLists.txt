@@ -18,17 +18,20 @@ set(CMAKE_PREFIX_PATH "$ENV{VCPKG_ROOT}/installed/x64-linux")
 # Find PCL package
 find_package(PCL REQUIRED COMPONENTS common io visualization)
 
+# Find CGAL package
+find_package(CGAL REQUIRED)
+
 # Include directories
-include_directories(${PCL_INCLUDE_DIRS})
+include_directories(${PCL_INCLUDE_DIRS} ${CGAL_INCLUDE_DIRS})
 
 # Link directories
-link_directories(${PCL_LIBRARY_DIRS})
+link_directories(${PCL_LIBRARY_DIRS} ${CGAL_LIBRARY_DIRS})
 
 # Add executable
 add_executable(pcl_project main.cpp)
 
 # Link libraries
-target_link_libraries(pcl_project ${PCL_LIBRARIES})
+target_link_libraries(pcl_project ${PCL_LIBRARIES} ${CGAL_LIBRARIES})
 
 # Add definitions
 add_definitions(${PCL_DEFINITIONS})
