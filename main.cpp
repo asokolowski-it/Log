@@ -77,8 +77,8 @@ bool savePointCloud(const std::string& filename, pcl::PointCloud<pcl::PointXYZRG
 }
 
 int main(int argc, char** argv) {
-    if (argc != 7) {
-        std::cerr << "Usage: " << argv[0] << " <input_ply_file> <aligned_ply_file> <output_ply_file> <x_adjustment> <y_adjustment> <z_adjustment>" << std::endl;
+    if (argc != 8) {
+        std::cerr << "Usage: " << argv[0] << " <input_ply_file> <aligned_ply_file> <output_ply_file> <x_adjustment> <y_adjustment> <z_adjustment> <save_aligned>" << std::endl;
         return -1;
     }
 
@@ -88,6 +88,7 @@ int main(int argc, char** argv) {
     float x_adjustment = std::stof(argv[4]);
     float y_adjustment = std::stof(argv[5]);
     float z_adjustment = std::stof(argv[6]);
+    bool save_aligned = std::string(argv[7]) == "true";
 
     auto cloud = loadPointCloud(input_filename);
     if (!cloud) {
@@ -96,9 +97,11 @@ int main(int argc, char** argv) {
 
     findAndAlignCentralAxis(cloud, x_adjustment, y_adjustment, z_adjustment);
     
-    // Save the point cloud after aligning the central axis
-    if (!savePointCloud(aligned_filename, cloud)) {
-        return -1;
+    // Save the point cloud after aligning the central axis if the flag is true
+    if (save_aligned) {
+        if (!savePointCloud(aligned_filename, cloud)) {
+            return -1;
+        }
     }
 
     float biggest_radius = calculateBiggestRadius(cloud);
@@ -108,6 +111,10 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    std::cout << "Transformation complete. Aligned output saved to " << aligned_filename << " and final output saved to " << output_filename << std::endl;
+    std::cout << "Transformation complete.";
+    if (save_aligned) {
+        std::cout << " Aligned output saved to " << aligned_filename << ".";
+    }
+    std::cout << " Final output saved to " << output_filename << std::endl;
     return 0;
 }
