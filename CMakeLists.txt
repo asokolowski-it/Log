@@ -16,7 +16,7 @@ set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CAC
 set(CMAKE_PREFIX_PATH "$ENV{VCPKG_ROOT}/installed/x64-linux")
 
 # Find PCL package
-find_package(PCL REQUIRED COMPONENTS common io visualization)
+find_package(PCL REQUIRED COMPONENTS common io visualization features kdtree search)
 
 # Include directories
 include_directories(${PCL_INCLUDE_DIRS})
